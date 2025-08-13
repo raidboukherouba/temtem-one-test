@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsNotEmpty, IsUrl, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -10,13 +10,15 @@ export class CreateProductDto {
   description: string;
 
   @IsNumber()
-  @Min(0)
   price: number;
 
-  @IsString()
+  @IsUrl()
   @IsNotEmpty()
-  category: string;
+  imageUrl: string;
 
-  @IsUrl({}, { message: 'Image must be a valid URL' })
-  image: string;
+  @IsOptional()
+  categoryId?: number; // category is optional in Prisma schema
+
+  @IsNotEmpty()
+  createdById: number; // required because of relation to User
 }

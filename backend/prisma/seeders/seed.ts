@@ -1,39 +1,24 @@
 import { PrismaClient } from '@prisma/client';
+import { seedUsers } from './users.seed';
+import { seedCategories } from './categories.seed';
+import { seedProducts } from './products.seed';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Delete existing products
+  console.log('Seeding started...');
+  
+  // Clear existing data (optional - be careful in production!)
   await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.user.deleteMany();
 
-  // Insert sample products
-  await prisma.product.createMany({
-    data: [
-      {
-        name: 'Gaming Mouse',
-        description: 'High precision wireless gaming mouse.',
-        price: 49.99,
-        category: 'Electronics',
-        image: 'https://example.com/images/mouse.jpg',
-      },
-      {
-        name: 'Mechanical Keyboard',
-        description: 'RGB mechanical keyboard with blue switches.',
-        price: 89.99,
-        category: 'Electronics',
-        image: 'https://example.com/images/keyboard.jpg',
-      },
-      {
-        name: 'Office Chair',
-        description: 'Ergonomic office chair with lumbar support.',
-        price: 199.99,
-        category: 'Furniture',
-        image: 'https://example.com/images/chair.jpg',
-      },
-    ],
-  });
+  // Seed in proper order to maintain relationships
+  const users = await seedUsers(prisma);
+  const categories = await seedCategories(prisma);
+  await seedProducts(prisma, users, categories);
 
-  console.log('✅ Products inserted');
+  console.log('Seeding completed!');
 }
 
 main()

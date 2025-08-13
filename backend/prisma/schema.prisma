@@ -13,13 +13,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  role        Role      @default(GUEST)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String
   price       Float
-  category    String
-  image       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  imageUrl    String    @map("image_url")
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?      @map("category_id")
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdById Int       @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("categories")
+}
+
+enum Role {
+  GUEST
+  STORE_OWNER
 }

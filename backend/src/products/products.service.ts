@@ -5,21 +5,48 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
   
   async create(createProductDto: CreateProductDto) {
+    // Validate that the category exists if categoryId is provided
+    if (createProductDto.categoryId) {
+      const categoryExists = await this.prisma.category.findUnique({
+        where: { id: createProductDto.categoryId },
+      });
+      if (!categoryExists) {
+        throw new NotFoundException(`Category with ID ${createProductDto.categoryId} not found`);
+      }
+    }
+
+    // Validate that the user exists
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: createProductDto.createdById },
+    });
+    if (!userExists) {
+      throw new NotFoundException(`User with ID ${createProductDto.createdById} not found`);
+    }
+
     return this.prisma.product.create({
       data: createProductDto,
     });
   }
 
   async findAll() {
-    return this.prisma.product.findMany();
+    return this.prisma.product.findMany({
+      include: {
+        category: true,
+        createdBy: true,
+      },
+    });
   }
 
   async findOne(id: number) {
     const product = await this.prisma.product.findUnique({
       where: { id },
+      include: {
+        category: true,
+        createdBy: true,
+      },
     });
 
     if (!product) {
@@ -32,6 +59,15 @@ export class ProductsService {
   async update(id: number, updateProductDto: UpdateProductDto) {
     // Ensure product exists before updating
     await this.findOne(id);
+
+    if (updateProductDto.categoryId) {
+      const categoryExists = await this.prisma.category.findUnique({
+        where: { id: updateProductDto.categoryId },
+      });
+      if (!categoryExists) {
+        throw new NotFoundException(`Category with ID ${updateProductDto.categoryId} not found`);
+      }
+    }
 
     return this.prisma.product.update({
       where: { id },
