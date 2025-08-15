@@ -31,8 +31,10 @@ export class ProductsService {
     });
   }
 
-  async findAll() {
+  async findAll(categoryId?: number, sortByPrice?: 'asc' | 'desc') {
     return this.prisma.product.findMany({
+      where: categoryId ? { categoryId } : undefined,
+      orderBy: sortByPrice ? { price: sortByPrice } : undefined,
       include: {
         category: true,
         createdBy: true,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -19,8 +19,14 @@ export class ProductsController {
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  findAll(
+    @Query('categoryId') categoryId?: string,
+    @Query('sortByPrice') sortByPrice?: 'asc' | 'desc',
+  ) {
+    return this.productsService.findAll(
+      categoryId ? +categoryId : undefined,
+      sortByPrice,
+    );
   }
 
   @Get(':id')
