@@ -23,7 +23,6 @@ export class CreateProductDto {
   @Min(0) // price cannot be negative
   price: number;
 
-  @IsUrl()
   @IsNotEmpty()
   imageUrl: string;
 

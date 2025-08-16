@@ -62,7 +62,7 @@ npm run start:dev
 - `POST /auth/register` — Register a new user
 ```md
 {
-  "email": "owner@store.com",
+  "email": "customer1@example.com",
   "password": "password123"
 }
 ```
@@ -70,7 +70,7 @@ npm run start:dev
 - `POST /auth/login` — Login and get JWT token
 ```md
 {
-  "email": "customer1@example.com",
+  "email": "owner@store.com",
   "password": "password123"
 }
 ```
